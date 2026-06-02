@@ -1,7 +1,7 @@
-# 🅰️ TP PROJET — Application Angular complète (GraphQL en bonus)
+# 🅰️ TP PROJET — Application Angular complète & volumineuse (GraphQL en bonus)
 
 > **Projet de synthèse — Formation Angular**
-> Tout ce que vous avez vu pendant les TP, réuni dans **une seule application**.
+> Tout ce que vous avez vu pendant les TP, réuni dans **une seule application riche**.
 
 ---
 
@@ -10,7 +10,7 @@
 | | |
 |---|---|
 | 👤 **Travail** | **INDIVIDUEL** (aucun binôme) |
-| 🕐 **Durée estimée** | ~ 1 jour et demi |
+| 🕐 **Durée estimée** | ~ 2 à 3 jours de travail |
 | 📅 **Date limite de rendu** | **jeudi avant 13h00** |
 | 🎤 **Soutenances** | à partir de **jeudi matin** (démo + questions) |
 | 📦 **Rendu** | un **dépôt GitHub public** (code + README + dossier `screenshots/`) |
@@ -24,82 +24,100 @@
 
 ## 🎯 Objectif
 
-Construire une **Single Page Application Angular** complète et propre, qui consomme
-une **API publique**, et qui démontre **toutes les compétences** vues en TP :
-composants, services & injection de dépendances, routing, formulaires, RxJS,
-**signals**, pipes, HttpClient, et **les bonnes pratiques / design patterns**.
+Construire une **Single Page Application Angular** **complète et conséquente** qui consomme
+une **API publique riche** (plusieurs ressources liées entre elles), et qui démontre
+**toutes les compétences** vues en TP : composants, services & injection de dépendances,
+routing, formulaires, RxJS, **signals**, pipes, HttpClient, et les **bonnes pratiques /
+design patterns**.
 
-Le **GraphQL est un bonus** (voir la section dédiée) — exactement dans l'esprit
-du TP DigiDex.
+Cette fois on vise le **volume et la structuration** : **plusieurs entités**,
+**plusieurs services**, **plusieurs modèles**, plusieurs pages — sans jamais sortir
+des notions vues en TP.
+
+Le **GraphQL est un bonus** (voir la section dédiée) — dans l'esprit du TP DigiDex.
 
 ---
 
-## 🧩 Le sujet : « Mon Catalogue »
+## 🧩 Le sujet : un « Explorateur » multi-ressources
 
-Vous réalisez une application de **catalogue** (liste + détail + recherche +
-favoris) autour d'un thème de votre choix, à partir d'une **API publique gratuite**.
+Vous réalisez une application qui explore **au moins 3 ressources liées** d'une même
+API publique (listes + détails + recherche + favoris + tableau de bord), avec une
+**navigation entre ressources liées**.
 
 ### Choisissez UNE API (ou proposez la vôtre, à valider) :
 
-| Thème | API (gratuite, sans clé) | Bonus GraphQL natif ? |
-|---|---|---|
-| Personnages Rick & Morty | `https://rickandmortyapi.com` | ✅ oui (endpoint GraphQL intégré) |
-| Pokémon | `https://pokeapi.co` | — |
-| Recettes | `https://www.themealdb.com/api.php` | — |
-| Livres | `https://openlibrary.org/developers/api` | — |
-| Films Studio Ghibli | `https://ghibliapi.vercel.app` | — |
+| Thème | API (gratuite, sans clé) | Ressources liées (≥ 3) | Bonus GraphQL natif ? |
+|---|---|---|---|
+| Rick & Morty | `https://rickandmortyapi.com` | **Characters · Locations · Episodes** | ✅ oui |
+| Pokémon | `https://pokeapi.co` | **Pokémon · Types · Abilities** | — |
+| Recettes | `https://www.themealdb.com/api.php` | **Meals · Categories · Areas** | — |
+| Livres | `https://openlibrary.org/developers/api` | **Books · Authors · Subjects** | — |
 
-> 💡 **Conseil :** choisissez un thème qui vous plaît, et **différent de votre
-> voisin**. Si vous visez le bonus GraphQL, **Rick & Morty** est idéal (il expose
-> à la fois REST et GraphQL).
+> 💡 **Exemple fil rouge (Rick & Morty)** : un *personnage* appartient à une
+> *localisation* et apparaît dans plusieurs *épisodes*. Depuis la fiche d'un
+> personnage, on doit pouvoir **naviguer** vers sa localisation et vers ses épisodes.
+> C'est cette **mise en relation** qui donne du volume au projet.
 
 ---
 
 ## ✅ Fonctionnalités OBLIGATOIRES
 
-Chaque point renvoie au TP correspondant. Respectez aussi les **indices** 👉.
+Le projet doit atteindre les **seuils de volume** indiqués (🔢) tout en respectant
+les **indices** 👉 et les **rappels de TP**.
 
-### 1. Liste paginée d'éléments *(cartes)*
-- Affichage en grille de cartes (image + titre).
-- **Pagination** (page précédente / suivante).
-- 👉 *Rappel TP — Composants & Control flow* : utilisez `@for (... ; track …)` et `@empty`.
-- 👉 Séparez **composant « smart »** (récupère les données) et **composant « dumb »** (affiche une carte) → **pattern Container/Presentational**.
+### 🅰️ Bloc A — Données, modèles & services *(le « volume »)*
 
-### 2. Recherche / filtre
-- Un champ de recherche qui filtre la liste.
-- 👉 *Rappel TP — RxJS* : appliquez un **`debounceTime`** (ou un `signal` + `computed`) pour ne pas spammer l'API à chaque touche.
+- 🔢 **Au moins 3 ressources** différentes de l'API (ex : personnages, lieux, épisodes).
+- 🔢 **Au moins 5 modèles / interfaces TypeScript** dans `models/` :
+  - un modèle par ressource (≥ 3),
+  - + les types techniques (réponse paginée de l'API, type d'info de pagination, etc.).
+- 🔢 **Au moins 5 services** dans `services/` :
+  - **1 service HTTP par ressource** (≥ 3) — ex : `CharacterService`, `LocationService`, `EpisodeService` ;
+  - **1 service d'état** pour les **favoris** (singleton + **signals**) ;
+  - **1 service utilitaire** réutilisable — ex : `StorageService` (localStorage) **OU** `NotificationService` (petits messages/toasts).
+- 👉 *Rappel TP — Services & DI* : tous les services sont `@Injectable({ providedIn: 'root' })` (singletons), **aucun appel HTTP directement dans un composant**.
+- 👉 *Rappel TP — HttpClient* : `HttpClient` renvoie des **Observables**, réponses **fortement typées** (génériques), gestion **loading** + **erreur**.
+- 💡 **Bonne pratique (Facade)** : vous pouvez créer un service « façade » qui orchestre plusieurs services pour une page (ex : un `DashboardFacade`).
 
-### 3. Page détail *(routing avec paramètre)*
-- Cliquer sur une carte ouvre une page **détail** avec plus d'infos.
-- 👉 *Rappel TP — Routing* : route `xxx/:id`, `<router-outlet>`, et **`withComponentInputBinding()`** pour récupérer l'`id` directement en `input()`.
+### 🅱️ Bloc B — Navigation & pages
 
-### 4. Favoris persistants
-- Ajouter / retirer des favoris, **persistés** (rechargez la page → ils sont toujours là, via `localStorage`).
-- 👉 *Rappel TP — Services & DI + Signals* : un **service `providedIn: 'root'`** (singleton) qui détient l'état avec un **`signal`** → **pattern Observable/State Service**.
+- 🔢 **Au moins 3 pages « liste »** (une par ressource) avec **pagination**.
+- 🔢 **Au moins 3 pages « détail »** (une par ressource) via une route `xxx/:id`.
+- 🔗 **Navigation entre ressources liées** : depuis un détail, des liens vers les
+  ressources associées (ex : personnage → localisation → autres personnages du lieu).
+- 🏠 **Une page d'accueil / tableau de bord** (voir Bloc C).
+- ⭐ **Une page « Favoris »**.
+- 📝 **Une page « Formulaire »** (voir Bloc C).
+- 🚫 **Une page 404** (route `**`).
+- 🔢 **Au moins une route en lazy loading** (`loadComponent`) — typiquement la page Favoris ou le Tableau de bord.
+- 👉 *Rappel TP — Routing* : `<router-outlet>`, routes avec paramètre, **`withComponentInputBinding()`** pour recevoir l'`id` en `input()`, redirection `**`.
 
-### 5. Formulaire réactif avec validation
-- Un **Reactive Form** (ex : ajouter un avis/une note locale, ou un formulaire de contact).
-- Au moins **2 validateurs** (`required`, `minLength`, `email`, …) + affichage des erreurs.
-- 👉 *Rappel TP — Formulaires* : `FormBuilder`, `FormGroup`, `Validators`.
+### 🅲️ Bloc C — Interactions
 
-### 6. Appels HTTP propres
-- Toutes les requêtes passent par un **service dédié** (jamais directement dans le composant).
-- **Typage fort** des réponses (interfaces / modèles), gestion des états **loading** et **erreur**.
-- 👉 *Rappel TP — HttpClient* : `HttpClient` renvoie des **Observables**.
+- 🔎 **Recherche / filtre** sur les listes.
+  👉 *Rappel TP — RxJS* : **`debounceTime`** (+ `distinctUntilChanged`, `switchMap`) **ou** `signal` + `computed`.
+- ⭐ **Favoris persistants** : ajout/retrait, **persistés** (rechargement → toujours là, via `localStorage`).
+  👉 *Rappel TP — Signals* : l'état des favoris est un **`signal`** ; un **`computed`** expose le nombre de favoris.
+- 📊 **Tableau de bord (dashboard)** : quelques **statistiques** calculées avec des
+  **`computed`** signals (ex : nombre total d'éléments vus, nombre de favoris par
+  ressource, répartition par statut/catégorie…).
+- 📝 **Formulaire réactif** avec **≥ 3 validateurs** (`required`, `minLength`, `email`, `pattern`…),
+  affichage clair des erreurs, bouton désactivé tant que le formulaire est invalide.
+  Exemples : formulaire d'**avis/note locale** sur un élément, ou **filtre avancé**, ou **contact**.
+  👉 *Rappel TP — Formulaires* : `FormBuilder`, `FormGroup`, `Validators`.
 
-### 7. Au moins un *pipe* personnalisé
-- Ex : formater une date, tronquer un texte, mettre en majuscule un statut…
-- 👉 *Rappel TP — Pipes* : un pipe **pur** par défaut (perf).
+### 🅳️ Bloc D — Qualité, composants & pipes
 
-### 8. Lazy loading
-- Au moins **une route chargée en lazy** (`loadComponent`).
-- 👉 *Rappel TP — Routing/Perf* : réduit le bundle initial.
-
-### 9. Bonnes pratiques transverses
-- **`ChangeDetectionStrategy.OnPush`** sur vos composants de présentation.
-- **Désabonnement propre** : privilégiez le **`pipe async`** (ou `takeUntilDestroyed()`), pas de `subscribe()` oublié.
-- Architecture en dossiers : `pages/`, `components/`, `services/`, `models/`.
-- **TypeScript strict**, **aucun `any`**.
+- 🔢 **Au moins 4 composants réutilisables (« dumb »)** dans `components/`, réutilisés
+  par plusieurs pages — ex : `CardComponent`, `SearchBarComponent`, `PaginatorComponent`,
+  `LoaderComponent`, `ErrorMessageComponent`.
+  👉 **Pattern Container/Presentational** : pages = *smart*, composants partagés = *dumb*.
+- 🔢 **Au moins 2 pipes personnalisés** dans `pipes/` (ex : `truncate`, `capitalize`, un format de date…).
+  👉 *Rappel TP — Pipes* : pipes **purs** par défaut.
+- 🟢 **`ChangeDetectionStrategy.OnPush`** sur les composants de présentation.
+- 🧹 **Désabonnement propre** : **`pipe async`** (ou `takeUntilDestroyed()`), pas de `subscribe()` oublié.
+- 🧱 **Architecture claire** : `pages/`, `components/`, `services/`, `models/`, `pipes/`.
+- 🧪 **TypeScript strict**, **aucun `any`**.
 
 ---
 
@@ -112,8 +130,8 @@ Dans l'esprit du **TP DigiDex** :
 
 Exigences du bonus :
 - au moins **une query avec variables** (pagination ou recherche) ;
-- les données s'affichent réellement dans l'app ;
-- dans le README : **expliquez l'avantage de GraphQL** par rapport au REST que vous avez utilisé (over-fetching / under-fetching, un seul endpoint, schéma typé…).
+- idéalement, une query qui récupère **une ressource ET ses relations en un seul appel** (l'argument massue de GraphQL) ;
+- dans le README : **expliquez l'avantage de GraphQL** par rapport au REST (over-fetching / under-fetching, un seul endpoint, schéma typé…).
 
 > 💡 *Indices issus du TP DigiDex* :
 > - vérifiez l'**URL du endpoint** dans `app.config.ts` (pas de placeholder oublié) ;
@@ -126,16 +144,16 @@ Exigences du bonus :
 
 Répondez en **2–4 phrases** chacune. Elles seront reprises en soutenance.
 
-1. Quelle est la différence entre un composant **« smart »** et **« dumb »** ? Donnez un exemple **dans votre projet**.
-2. Pourquoi utiliser **`OnPush`** ? Quel lien avec l'**immutabilité** des données ?
+1. Différence entre un composant **« smart »** et **« dumb »** ? Donnez un exemple **dans votre projet**.
+2. Pourquoi **`OnPush`** ? Quel lien avec l'**immutabilité** des données ?
 3. Pourquoi préférer le **`pipe async`** à un `subscribe()` manuel ? Quel **risque** évite-t-on ?
-4. `providedIn: 'root'` : quel **design pattern** cela implémente-t-il ? Combien d'instances du service existe-t-il ?
-5. Quelle différence entre un **`signal`** et un **`BehaviorSubject`** ? Quand utiliser l'un ou l'autre ?
-6. Pour une **recherche** au clavier, quel opérateur RxJS entre **`switchMap`** et **`mergeMap`**, et pourquoi ?
-7. **Reactive Forms** vs **Template-driven** : lequel avez-vous choisi et **pourquoi** ?
-8. Qu'apporte concrètement le **lazy loading** dans votre application ?
-9. *(Bonus)* GraphQL vs REST : expliquez **over-fetching** et **under-fetching** avec un exemple de votre projet.
-10. Citez **un design pattern** que vous avez utilisé (Container/Presentational, Singleton, Facade, Observer…) et **où** dans le code.
+4. `providedIn: 'root'` : quel **design pattern** ? Combien d'instances du service existe-t-il ?
+5. Différence entre un **`signal`** et un **`BehaviorSubject`** ? Quand utiliser l'un ou l'autre ?
+6. Pour une **recherche** au clavier : **`switchMap`** ou **`mergeMap`**, et pourquoi ?
+7. **Reactive Forms** vs **Template-driven** : votre choix et **pourquoi** ?
+8. Comment avez-vous **organisé vos services** (un par ressource, façade, état) et pourquoi ?
+9. Qu'apporte concrètement le **lazy loading** dans votre application ?
+10. *(Bonus)* GraphQL vs REST : expliquez **over-fetching** / **under-fetching** avec un exemple de votre projet.
 
 ---
 
@@ -143,40 +161,53 @@ Répondez en **2–4 phrases** chacune. Elles seront reprises en soutenance.
 
 Nommez-les clairement. On doit y voir :
 
-- [ ] `01-liste.png` — la liste paginée
-- [ ] `02-recherche.png` — la recherche en action
-- [ ] `03-detail.png` — la page détail
-- [ ] `04-favoris.png` — un favori ajouté **+ encore présent après rechargement**
-- [ ] `05-formulaire-erreurs.png` — le formulaire avec messages de validation
-- [ ] `06-loading-erreur.png` — l'état *chargement* et/ou l'état *erreur*
-- [ ] `07-arborescence.png` — la structure des dossiers du projet
-- [ ] *(bonus)* `08-graphql.png` — une requête GraphQL (onglet **Network** ou **Apollo Sandbox**)
+- [ ] `01-liste-ressource1.png` — une liste paginée (ressource 1)
+- [ ] `02-liste-ressource2.png` — une liste paginée (ressource 2)
+- [ ] `03-recherche.png` — la recherche en action
+- [ ] `04-detail.png` — une page détail
+- [ ] `05-relations.png` — la **navigation entre ressources liées** (depuis un détail)
+- [ ] `06-favoris.png` — un favori ajouté **+ encore présent après rechargement**
+- [ ] `07-dashboard.png` — le tableau de bord avec ses statistiques
+- [ ] `08-formulaire-erreurs.png` — le formulaire avec messages de validation
+- [ ] `09-loading-erreur.png` — l'état *chargement* et/ou l'état *erreur*
+- [ ] `10-arborescence.png` — la structure des dossiers (`services/`, `models/`, etc.)
+- [ ] *(bonus)* `11-graphql.png` — une requête GraphQL (onglet **Network** ou **Apollo Sandbox**)
 
 ---
 
 ## 📦 Structure attendue du dépôt
 
 ```
-mon-catalogue/
+mon-explorateur/
 ├── README.md            ← présentation, install/run, patterns, RÉPONSES aux questions
 ├── .gitignore           ← node_modules/ exclu !
 ├── screenshots/         ← toutes les captures demandées
-├── src/                 ← le front Angular
+├── src/
 │   └── app/
-│       ├── pages/
-│       ├── components/
-│       ├── services/
-│       └── models/
-└── (bonus) api-graphql/ ← votre passerelle Apollo Server, si Option B
+│       ├── pages/        ← composants "smart" (listes, détails, favoris, dashboard, form, 404)
+│       │   ├── ressource1-list/   ressource1-detail/
+│       │   ├── ressource2-list/   ressource2-detail/
+│       │   ├── ressource3-list/   ressource3-detail/
+│       │   ├── dashboard/
+│       │   ├── favoris/
+│       │   └── not-found/
+│       ├── components/   ← composants "dumb" réutilisables (card, search-bar, paginator, loader, error)
+│       ├── services/     ← ≥ 5 services (1 HTTP par ressource + favoris + util/facade)
+│       ├── models/       ← ≥ 5 interfaces (1 par ressource + types techniques)
+│       ├── pipes/        ← ≥ 2 pipes personnalisés
+│       ├── app.routes.ts
+│       └── app.config.ts
+└── (bonus) api-graphql/  ← votre passerelle Apollo Server, si Option B
 ```
 
 Votre **README** doit contenir au minimum :
-1. Le **nom du projet** et l'API utilisée.
+1. Le **nom du projet** et l'API utilisée + les **3 ressources** choisies.
 2. **Comment lancer** (`npm install`, `npm start`, port).
 3. La **liste des fonctionnalités** réalisées (cochez ce qui est fait).
 4. Les **design patterns** utilisés (où et pourquoi).
-5. Les **réponses aux questions** ci-dessus.
-6. Les **captures** (ou un lien vers le dossier `screenshots/`).
+5. L'**organisation des services et des modèles**.
+6. Les **réponses aux questions** ci-dessus.
+7. Les **captures** (ou un lien vers le dossier `screenshots/`).
 
 ---
 
@@ -184,10 +215,11 @@ Votre **README** doit contenir au minimum :
 
 | Critère | Points |
 |---|---|
-| Fonctionnalités obligatoires (1 → 8) | **10** |
-| Bonnes pratiques & design patterns (OnPush, désabonnement, archi, typage) | **4** |
-| Qualité du code + commits Git réguliers et lisibles | **2** |
-| README complet + réponses aux questions | **2** |
+| Bloc A — Volume : ≥ 3 ressources, ≥ 5 modèles, ≥ 5 services, HTTP propre | **5** |
+| Bloc B — Navigation : ≥ 3 listes + ≥ 3 détails, relations, lazy loading, 404 | **4** |
+| Bloc C — Interactions : recherche, favoris persistants, dashboard, formulaire validé | **4** |
+| Bloc D — Qualité : OnPush, désabonnement, composants dumb, pipes, typage, archi | **2** |
+| Git (commits réguliers) + README complet + réponses aux questions | **3** |
 | Soutenance / démo orale | **2** |
 | 🌟 **Bonus GraphQL** | **+2 à +3** |
 
@@ -198,10 +230,12 @@ Votre **README** doit contenir au minimum :
 
 ## 🧠 Conseils & pièges à éviter *(retours d'expérience des TP)*
 
-- ✅ **Vérifiez `package.json`** : de vraies versions de dépendances (pas de `"..."` resté en place) → sinon `ERR_MODULE_NOT_FOUND`.
-- ✅ **Control flow** : l'alias `as` n'est autorisé que sur le **`@if` principal**, **jamais sur `@else if`** (erreur `NG5002`). Imbriquez dans un `@else { @if (x; as y) {…} }`.
-- ✅ **Après modif de `app.config.ts`** (providers, Apollo…), **redémarrez `ng serve`** : ce n'est **pas** rechargé à chaud. Pensez au **hard refresh** (`Ctrl+Shift+R`).
-- ✅ **Gérez le `loading`** : avec Apollo, `valueChanges` émet d'abord `data: undefined` → **filtrez**. Avec HttpClient, affichez un spinner puis gérez l'erreur.
+- ✅ **Commencez par les modèles et les services** (Bloc A) : c'est la fondation. Une ressource qui marche bien → dupliquez le schéma pour les 2 autres.
+- ✅ **Factorisez vos composants dumb** (card, loader, paginator…) : ils servent pour les 3 ressources → moins de code, plus de points.
+- ✅ **Vérifiez `package.json`** : de vraies versions (pas de `"..."`) → sinon `ERR_MODULE_NOT_FOUND`.
+- ✅ **Control flow** : l'alias `as` est autorisé **uniquement sur le `@if` principal**, **jamais sur `@else if`** (erreur `NG5002`). Imbriquez dans `@else { @if (x; as y) {…} }`.
+- ✅ **Après modif de `app.config.ts`** (providers, Apollo…), **redémarrez `ng serve`** (pas géré par le HMR) + **hard refresh** (`Ctrl+Shift+R`).
+- ✅ **Gérez le `loading`** : Apollo émet d'abord `data: undefined` → **filtrez**. HttpClient → spinner + gestion d'erreur.
 - ✅ **CORS** si vous créez votre propre API.
 - ✅ **N'envoyez pas `node_modules`** dans Git (d'où le `.gitignore`).
 - ✅ **Committez régulièrement** : un seul commit « final » est mal vu.
@@ -210,15 +244,15 @@ Votre **README** doit contenir au minimum :
 
 ## 🗂️ Récapitulatif compétences ↔ TP
 
-| Fonctionnalité | TP de référence |
+| Fonctionnalité du projet | TP de référence |
 |---|---|
-| Composants standalone, control flow `@if`/`@for` | TP Composants & templates |
-| Services, injection de dépendances, singleton | TP Services & DI |
-| Routing, paramètres, lazy loading | TP Routing |
-| Formulaires réactifs & validation | TP Formulaires |
-| HttpClient & Observables | TP HttpClient / RxJS |
-| Signals (état réactif) | TP Signals |
-| Pipes | TP Pipes |
+| Composants standalone, control flow `@if`/`@for`, composants dumb | TP Composants & templates |
+| ≥ 5 services, injection de dépendances, singleton, façade | TP Services & DI |
+| Routing multi-pages, paramètres, relations, lazy loading, 404 | TP Routing |
+| Formulaire réactif & validation | TP Formulaires |
+| HttpClient, ≥ 3 services HTTP, Observables, recherche RxJS | TP HttpClient / RxJS |
+| Favoris + dashboard via signals / computed | TP Signals |
+| ≥ 2 pipes | TP Pipes |
 | Bonnes pratiques & design patterns | transversal (tous les TP) |
 | **GraphQL / Apollo (bonus)** | **TP DigiDex** |
 
@@ -227,12 +261,15 @@ Votre **README** doit contenir au minimum :
 ## ✔️ Checklist avant de rendre
 
 - [ ] L'appli **se lance** sans erreur (`npm install` puis `npm start`).
-- [ ] Les **8 fonctionnalités obligatoires** sont présentes.
+- [ ] **≥ 3 ressources**, **≥ 5 modèles**, **≥ 5 services**.
+- [ ] **≥ 3 listes** + **≥ 3 détails** + favoris + dashboard + formulaire + 404.
+- [ ] **Navigation entre ressources liées** fonctionnelle.
+- [ ] **≥ 1 route lazy**, **≥ 4 composants dumb**, **≥ 2 pipes**.
+- [ ] Favoris **persistants** après rechargement.
 - [ ] `OnPush`, désabonnement propre, **aucun `any`**.
 - [ ] **README** complet + **réponses aux 10 questions**.
 - [ ] Dossier **`screenshots/`** rempli.
-- [ ] **`node_modules/` exclu** du dépôt.
-- [ ] Commits réguliers, dépôt **public**.
+- [ ] **`node_modules/` exclu** du dépôt, dépôt **public**, commits réguliers.
 - [ ] Lien envoyé sur **Teams** ou à **contact.infosoftware@gmail.com** avant **jeudi 13h00**, objet `Nom Prénom — TP Projet Angular`.
 
 ---
