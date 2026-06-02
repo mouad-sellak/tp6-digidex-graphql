@@ -1,0 +1,246 @@
+/* ============================================================
+   DigiDex — styles globaux
+   ============================================================ */
+
+:root {
+  --violet: #6c2bd9;
+  --violet-clair: #9b5de5;
+  --violet-fonce: #4a148c;
+  --fond: #f5f3ff;
+  --carte: #ffffff;
+  --texte: #1e1b2e;
+  --texte-doux: #6b6480;
+  --bordure: #e7e1f5;
+  --ombre: 0 4px 14px rgba(76, 20, 140, 0.10);
+  --ombre-hover: 0 10px 28px rgba(76, 20, 140, 0.22);
+  --rayon: 16px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: var(--texte);
+  background:
+    radial-gradient(1200px 500px at 100% -10%, rgba(155, 93, 229, 0.18), transparent),
+    radial-gradient(900px 500px at -10% 0%, rgba(108, 43, 217, 0.14), transparent),
+    var(--fond);
+}
+
+/* L'app a un peu d'air et reste centrée */
+app-root {
+  display: block;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+}
+
+/* -------- Titres -------- */
+h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  margin: 0 0 1.25rem;
+  background: linear-gradient(90deg, var(--violet), var(--violet-clair));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.5px;
+}
+
+h1 small {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--texte-doux);
+  -webkit-text-fill-color: var(--texte-doux);
+}
+
+h3 { color: var(--violet-fonce); }
+
+/* -------- Formulaire de recherche -------- */
+form {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+input {
+  flex: 1 1 240px;
+  padding: 0.7rem 1rem;
+  font-size: 1rem;
+  border: 2px solid var(--bordure);
+  border-radius: 999px;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--violet-clair);
+  box-shadow: 0 0 0 4px rgba(155, 93, 229, 0.18);
+}
+
+/* -------- Boutons -------- */
+button {
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(90deg, var(--violet), var(--violet-clair));
+  box-shadow: var(--ombre);
+  transition: transform 0.12s, box-shadow 0.12s, opacity 0.12s;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--ombre-hover);
+}
+
+button:active:not(:disabled) { transform: translateY(0); }
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* -------- Grille de cartes -------- */
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.1rem;
+}
+
+.carte {
+  position: relative;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 0.9rem;
+  text-align: center;
+  box-shadow: var(--ombre);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.carte:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--ombre-hover);
+}
+
+.carte a {
+  text-decoration: none;
+  color: var(--texte);
+  display: block;
+}
+
+.carte img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  background: var(--fond);
+  border-radius: 12px;
+  padding: 0.4rem;
+}
+
+.carte h3 {
+  margin: 0.7rem 0 0;
+  font-size: 0.98rem;
+  color: var(--texte);
+}
+
+/* Bouton favori en coin de carte */
+.carte .fav {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.9);
+  color: inherit;
+  box-shadow: var(--ombre);
+}
+
+.carte .fav:hover:not(:disabled) { transform: scale(1.15); }
+
+/* -------- Pagination -------- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.pagination span {
+  font-weight: 600;
+  color: var(--texte-doux);
+  min-width: 130px;
+  text-align: center;
+}
+
+/* -------- États (chargement / erreur) -------- */
+.error {
+  background: #fff0f0;
+  border: 1px solid #ffc9c9;
+  color: #c92a2a;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* -------- Page détail -------- */
+app-digimon-detail a[routerLink="/"] {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--violet);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+app-digimon-detail a[routerLink="/"]:hover { text-decoration: underline; }
+
+app-digimon-detail img {
+  display: block;
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: 1rem;
+  box-shadow: var(--ombre);
+  margin: 0.5rem 0 1.5rem;
+}
+
+app-digimon-detail ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+app-digimon-detail li {
+  background: var(--carte);
+  border: 1px solid var(--bordure);
+  border-radius: 10px;
+  padding: 0.55rem 0.9rem;
+  box-shadow: var(--ombre);
+}
+
+app-digimon-detail li a {
+  color: var(--violet);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+app-digimon-detail li a:hover { text-decoration: underline; }

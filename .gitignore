@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Angular / build
+dist/
+.angular/
+/tmp/
+out-tsc/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environnement
+.env
+.env.local
+
+# OS / éditeurs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
