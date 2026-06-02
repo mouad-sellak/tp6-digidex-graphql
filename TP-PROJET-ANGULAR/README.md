@@ -1,7 +1,7 @@
-# 🅰️ TP PROJET — Application Angular complète & volumineuse (GraphQL en bonus)
+# 🅰️ TP PROJET — Rick & Morty Explorer (Angular + GraphQL en bonus)
 
 > **Projet de synthèse — Formation Angular**
-> Tout ce que vous avez vu pendant les TP, réuni dans **une seule application riche**.
+> Tout ce que vous avez vu pendant les TP, réuni dans **une seule application**.
 
 ---
 
@@ -10,7 +10,6 @@
 | | |
 |---|---|
 | 👤 **Travail** | **INDIVIDUEL** (aucun binôme) |
-| 🕐 **Durée estimée** | ~ 2 à 3 jours de travail |
 | 📅 **Date limite de rendu** | **jeudi avant 13h00** |
 | 🎤 **Soutenances** | à partir de **jeudi matin** (démo + questions) |
 | 📦 **Rendu** | un **dépôt GitHub public** (code + README + dossier `screenshots/`) |
@@ -22,155 +21,208 @@
 
 ---
 
-## 🎯 Objectif
+## 🎯 Le projet : **Rick & Morty Explorer**
 
-Construire une **Single Page Application Angular** **complète et conséquente** qui consomme
-une **API publique riche** (plusieurs ressources liées entre elles), et qui démontre
-**toutes les compétences** vues en TP : composants, services & injection de dépendances,
-routing, formulaires, RxJS, **signals**, pipes, HttpClient, et les **bonnes pratiques /
-design patterns**.
+Vous développez une SPA Angular qui explore **3 ressources liées** de l'API
+**imposée** : **`https://rickandmortyapi.com`**.
 
-Cette fois on vise le **volume et la structuration** : **plusieurs entités**,
-**plusieurs services**, **plusieurs modèles**, plusieurs pages — sans jamais sortir
-des notions vues en TP.
+- **Personnages** (Characters) — `https://rickandmortyapi.com/api/character`
+- **Lieux** (Locations) — `https://rickandmortyapi.com/api/location`
+- **Épisodes** (Episodes) — `https://rickandmortyapi.com/api/episode`
 
-Le **GraphQL est un bonus** (voir la section dédiée) — dans l'esprit du TP DigiDex.
+Chaque endpoint renvoie un objet `{ info, results }` :
+`info = { count, pages, next, prev }` et `results = [ … ]`.
+Filtres et pagination via query params, ex : `/api/character?page=2&name=rick&status=alive`.
 
----
-
-## 🧩 Le sujet : un « Explorateur » multi-ressources
-
-Vous réalisez une application qui explore **au moins 3 ressources liées** d'une même
-API publique (listes + détails + recherche + favoris + tableau de bord), avec une
-**navigation entre ressources liées**.
-
-### Choisissez UNE API (ou proposez la vôtre, à valider) :
-
-| Thème | API (gratuite, sans clé) | Ressources liées (≥ 3) | Bonus GraphQL natif ? |
-|---|---|---|---|
-| Rick & Morty | `https://rickandmortyapi.com` | **Characters · Locations · Episodes** | ✅ oui |
-| Pokémon | `https://pokeapi.co` | **Pokémon · Types · Abilities** | — |
-| Recettes | `https://www.themealdb.com/api.php` | **Meals · Categories · Areas** | — |
-| Livres | `https://openlibrary.org/developers/api` | **Books · Authors · Subjects** | — |
-
-> 💡 **Exemple fil rouge (Rick & Morty)** : un *personnage* appartient à une
-> *localisation* et apparaît dans plusieurs *épisodes*. Depuis la fiche d'un
-> personnage, on doit pouvoir **naviguer** vers sa localisation et vers ses épisodes.
-> C'est cette **mise en relation** qui donne du volume au projet.
+**Les ressources sont liées** : un personnage a une origine + un lieu actuel et une
+liste d'épisodes ; un lieu a une liste de résidents (personnages) ; un épisode a une
+liste de personnages. Vous **devez** exploiter ces liens (voir Bloc B).
 
 ---
 
-## ✅ Fonctionnalités OBLIGATOIRES
+## ✅ Travail à réaliser
 
-Le projet doit atteindre les **seuils de volume** indiqués (🔢) tout en respectant
-les **indices** 👉 et les **rappels de TP**.
+Faites **exactement** ce qui suit. Les rappels de TP sont indiqués 👉.
 
-### 🅰️ Bloc A — Données, modèles & services *(le « volume »)*
+### 🅰️ Bloc A — Modèles & Services
 
-- 🔢 **Au moins 3 ressources** différentes de l'API (ex : personnages, lieux, épisodes).
-- 🔢 **Au moins 5 modèles / interfaces TypeScript** dans `models/` :
-  - un modèle par ressource (≥ 3),
-  - + les types techniques (réponse paginée de l'API, type d'info de pagination, etc.).
-- 🔢 **Au moins 5 services** dans `services/` :
-  - **1 service HTTP par ressource** (≥ 3) — ex : `CharacterService`, `LocationService`, `EpisodeService` ;
-  - **1 service d'état** pour les **favoris** (singleton + **signals**) ;
-  - **1 service utilitaire** réutilisable — ex : `StorageService` (localStorage) **OU** `NotificationService` (petits messages/toasts).
-- 👉 *Rappel TP — Services & DI* : tous les services sont `@Injectable({ providedIn: 'root' })` (singletons), **aucun appel HTTP directement dans un composant**.
-- 👉 *Rappel TP — HttpClient* : `HttpClient` renvoie des **Observables**, réponses **fortement typées** (génériques), gestion **loading** + **erreur**.
-- 💡 **Bonne pratique (Facade)** : vous pouvez créer un service « façade » qui orchestre plusieurs services pour une page (ex : un `DashboardFacade`).
+**Créez ces 5 fichiers de modèles dans `src/app/models/` :**
 
-### 🅱️ Bloc B — Navigation & pages
+1. `info.model.ts` → interface **`Info`** : `count: number`, `pages: number`, `next: string | null`, `prev: string | null`.
+2. `api-response.model.ts` → interface générique **`ApiResponse<T>`** : `info: Info`, `results: T[]`.
+3. `character.model.ts` → interface **`Character`** : `id`, `name`, `status`, `species`, `type`, `gender`, `image`, `origin: { name; url }`, `location: { name; url }`, `episode: string[]`, `url`.
+4. `location.model.ts` → interface **`Location`** : `id`, `name`, `type`, `dimension`, `residents: string[]`, `url`.
+5. `episode.model.ts` → interface **`Episode`** : `id`, `name`, `air_date`, `episode`, `characters: string[]`, `url`.
 
-- 🔢 **Au moins 3 pages « liste »** (une par ressource) avec **pagination**.
-- 🔢 **Au moins 3 pages « détail »** (une par ressource) via une route `xxx/:id`.
-- 🔗 **Navigation entre ressources liées** : depuis un détail, des liens vers les
-  ressources associées (ex : personnage → localisation → autres personnages du lieu).
-- 🏠 **Une page d'accueil / tableau de bord** (voir Bloc C).
-- ⭐ **Une page « Favoris »**.
-- 📝 **Une page « Formulaire »** (voir Bloc C).
-- 🚫 **Une page 404** (route `**`).
-- 🔢 **Au moins une route en lazy loading** (`loadComponent`) — typiquement la page Favoris ou le Tableau de bord.
-- 👉 *Rappel TP — Routing* : `<router-outlet>`, routes avec paramètre, **`withComponentInputBinding()`** pour recevoir l'`id` en `input()`, redirection `**`.
+**Créez ces 5 services dans `src/app/services/` (tous `@Injectable({ providedIn: 'root' })`) :**
+
+1. **`CharacterService`** :
+   - `getAll(page: number, name?: string, status?: string): Observable<ApiResponse<Character>>`
+   - `getById(id: number): Observable<Character>`
+   - `getMany(ids: number[]): Observable<Character[]>` *(pour `/api/character/1,2,3`)*
+2. **`LocationService`** : `getAll(page: number)` et `getById(id: number)`.
+3. **`EpisodeService`** : `getAll(page: number)`, `getById(id: number)`, `getMany(ids: number[])`.
+4. **`FavorisService`** (état des personnages favoris) :
+   - un **`signal`** `favoris` (liste de `Character`),
+   - `toggle(c: Character)`, `isFavori(id: number): boolean`,
+   - un **`computed`** `nombre`,
+   - persistance via `StorageService`.
+5. **`StorageService`** : `get<T>(key: string): T | null` et `set(key: string, value: unknown): void` (encapsule `localStorage`).
+
+👉 *Rappel TP — Services & DI + HttpClient* : **aucun appel HTTP dans un composant**,
+réponses **typées** avec les génériques, et gérez les états **loading** + **erreur**.
+💡 **Astuce relations** : les champs `episode`, `residents`, `characters` sont des
+**URLs** ; extrayez l'`id` à la fin de l'URL (`url.split('/').pop()`) pour appeler `getMany`.
+
+### 🅱️ Bloc B — Pages & Navigation
+
+**Créez ces 10 pages dans `src/app/pages/` :**
+
+| Page | Rôle |
+|---|---|
+| `dashboard` | **Page d'accueil** avec statistiques (voir Bloc C) |
+| `characters-list` | Liste paginée des personnages + recherche + filtre `status` |
+| `character-detail` | Fiche d'un personnage |
+| `locations-list` | Liste paginée des lieux |
+| `location-detail` | Fiche d'un lieu |
+| `episodes-list` | Liste paginée des épisodes |
+| `episode-detail` | Fiche d'un épisode |
+| `favoris` | Liste des personnages mis en favori |
+| `contact` | Formulaire réactif (Bloc C) |
+| `not-found` | Page 404 |
+
+**Mettez en place ces routes dans `app.routes.ts` :**
+
+```
+''                      → redirige vers 'dashboard'
+'dashboard'             → DashboardComponent
+'characters'            → CharactersListComponent
+'characters/:id'        → CharacterDetailComponent
+'locations'             → LocationsListComponent
+'locations/:id'         → LocationDetailComponent
+'episodes'              → EpisodesListComponent
+'episodes/:id'          → EpisodeDetailComponent
+'favoris'               → loadComponent (LAZY)
+'contact'               → loadComponent (LAZY)
+'**'                    → NotFoundComponent
+```
+
+👉 *Rappel TP — Routing* : activez `withComponentInputBinding()` et récupérez l'`id`
+de route via `input.required<string>()` dans les pages détail.
+
+**Implémentez ces navigations entre ressources liées (obligatoire) :**
+
+- Dans **`character-detail`** : afficher l'**origine** et le **lieu actuel** (liens cliquables vers `locations/:id`) **et** la liste des **épisodes** du personnage (cartes cliquables vers `episodes/:id`).
+- Dans **`location-detail`** : afficher la liste des **résidents** (personnages, cliquables vers `characters/:id`).
+- Dans **`episode-detail`** : afficher la liste des **personnages** de l'épisode (cliquables vers `characters/:id`).
 
 ### 🅲️ Bloc C — Interactions
 
-- 🔎 **Recherche / filtre** sur les listes.
-  👉 *Rappel TP — RxJS* : **`debounceTime`** (+ `distinctUntilChanged`, `switchMap`) **ou** `signal` + `computed`.
-- ⭐ **Favoris persistants** : ajout/retrait, **persistés** (rechargement → toujours là, via `localStorage`).
-  👉 *Rappel TP — Signals* : l'état des favoris est un **`signal`** ; un **`computed`** expose le nombre de favoris.
-- 📊 **Tableau de bord (dashboard)** : quelques **statistiques** calculées avec des
-  **`computed`** signals (ex : nombre total d'éléments vus, nombre de favoris par
-  ressource, répartition par statut/catégorie…).
-- 📝 **Formulaire réactif** avec **≥ 3 validateurs** (`required`, `minLength`, `email`, `pattern`…),
-  affichage clair des erreurs, bouton désactivé tant que le formulaire est invalide.
-  Exemples : formulaire d'**avis/note locale** sur un élément, ou **filtre avancé**, ou **contact**.
+- **Recherche** (page `characters-list`) : un champ qui filtre par **nom**, avec
+  **`debounceTime(300)` + `distinctUntilChanged()` + `switchMap()`** vers `CharacterService.getAll`.
+  Ajoutez un **filtre par `status`** (alive / dead / unknown).
+  👉 *Rappel TP — RxJS*.
+- **Pagination** : boutons *Précédent / Suivant* sur les 3 listes, en utilisant `info.pages`.
+- **Favoris** : sur chaque carte de personnage, un bouton ⭐ ajoute/retire le favori.
+  Les favoris sont **persistés** : après un rechargement de page, ils sont **toujours là**.
+  👉 *Rappel TP — Signals* (`signal` + `computed` dans `FavorisService`).
+- **Dashboard** : affichez ces statistiques calculées avec des **`computed`** :
+  - le **total** de personnages, de lieux et d'épisodes (via `info.count` des 3 endpoints) ;
+  - le **nombre de favoris** ;
+  - la **répartition des favoris par statut** (Alive / Dead / unknown).
+- **Formulaire de contact** (page `contact`) : un **Reactive Form** avec 3 champs et
+  ces validateurs :
+  - `nom` → `required`, `minLength(3)` ;
+  - `email` → `required`, `email` ;
+  - `message` → `required`, `minLength(10)`.
+  Le bouton *Envoyer* est **désactivé** tant que le formulaire est invalide ; affichez
+  les **messages d'erreur** sous chaque champ et un **message de succès** à la soumission.
   👉 *Rappel TP — Formulaires* : `FormBuilder`, `FormGroup`, `Validators`.
 
-### 🅳️ Bloc D — Qualité, composants & pipes
+### 🅳️ Bloc D — Composants, pipes & qualité
 
-- 🔢 **Au moins 4 composants réutilisables (« dumb »)** dans `components/`, réutilisés
-  par plusieurs pages — ex : `CardComponent`, `SearchBarComponent`, `PaginatorComponent`,
-  `LoaderComponent`, `ErrorMessageComponent`.
-  👉 **Pattern Container/Presentational** : pages = *smart*, composants partagés = *dumb*.
-- 🔢 **Au moins 2 pipes personnalisés** dans `pipes/` (ex : `truncate`, `capitalize`, un format de date…).
-  👉 *Rappel TP — Pipes* : pipes **purs** par défaut.
-- 🟢 **`ChangeDetectionStrategy.OnPush`** sur les composants de présentation.
-- 🧹 **Désabonnement propre** : **`pipe async`** (ou `takeUntilDestroyed()`), pas de `subscribe()` oublié.
-- 🧱 **Architecture claire** : `pages/`, `components/`, `services/`, `models/`, `pipes/`.
-- 🧪 **TypeScript strict**, **aucun `any`**.
+**Créez ces 5 composants « dumb » réutilisables dans `src/app/components/` :**
+
+1. **`CharacterCardComponent`** : `input()` un `Character`, `output()` un évènement *toggleFavori*.
+2. **`SearchBarComponent`** : `output()` le terme de recherche.
+3. **`PaginatorComponent`** : `input()` `currentPage` et `totalPages`, `output()` *prev* / *next*.
+4. **`LoaderComponent`** : un indicateur de chargement.
+5. **`ErrorMessageComponent`** : `input()` un message, `output()` *retry*.
+
+**Créez ces 2 pipes dans `src/app/pipes/` :**
+
+1. **`StatusPipe`** : transforme `'Alive' → '🟢 Vivant'`, `'Dead' → '🔴 Mort'`, `'unknown' → '⚪ Inconnu'`.
+2. **`TruncatePipe`** : tronque un texte à N caractères (`{{ texte | truncate:80 }}`).
+
+**Règles de qualité à respecter :**
+- `ChangeDetectionStrategy.OnPush` sur les 5 composants « dumb » et sur les pages liste/détail.
+- **Désabonnement propre** : utilisez le **`pipe async`** (ou `takeUntilDestroyed()`), jamais de `subscribe()` non nettoyé.
+- **TypeScript strict**, **aucun `any`**.
+- Architecture en dossiers : `pages/`, `components/`, `services/`, `models/`, `pipes/`.
 
 ---
 
 ## 🌟 BONUS — GraphQL (+ points)
 
-Dans l'esprit du **TP DigiDex** :
+L'API Rick & Morty expose un **endpoint GraphQL** : **`https://rickandmortyapi.com/graphql`**.
 
-- **Option A** *(recommandée si Rick & Morty)* : consommez l'**endpoint GraphQL existant** avec **`apollo-angular`** (`provideApollo`, `gql`, `watchQuery`).
-- **Option B** : créez votre **propre passerelle GraphQL** (Apollo Server, `@apollo/server`) qui interroge l'API REST, la **remodèle**, puis exposez un schéma typé que le front consomme.
+À faire pour le bonus :
+1. Installez et configurez **`apollo-angular`** (`provideApollo`, `InMemoryCache`).
+2. Remplacez **au moins une** des listes (ex : personnages) par une requête **GraphQL** `gql` avec **variables** (pagination + recherche).
+3. Tirez parti des **relations en un seul appel** — exemple :
 
-Exigences du bonus :
-- au moins **une query avec variables** (pagination ou recherche) ;
-- idéalement, une query qui récupère **une ressource ET ses relations en un seul appel** (l'argument massue de GraphQL) ;
-- dans le README : **expliquez l'avantage de GraphQL** par rapport au REST (over-fetching / under-fetching, un seul endpoint, schéma typé…).
+```graphql
+query ($page: Int, $name: String) {
+  characters(page: $page, filter: { name: $name }) {
+    info { count pages next prev }
+    results {
+      id name status image
+      location { id name }
+      episode { id name }
+    }
+  }
+}
+```
 
-> 💡 *Indices issus du TP DigiDex* :
-> - vérifiez l'**URL du endpoint** dans `app.config.ts` (pas de placeholder oublié) ;
-> - `valueChanges` d'Apollo émet d'abord un état *loading* où `data` est `undefined` → **filtrez** avant le `map` ;
-> - importez `InMemoryCache` depuis `@apollo/client/core`.
+4. Dans le README, **expliquez** l'avantage de GraphQL ici : récupérer un personnage
+   **avec son lieu et ses épisodes en une seule requête**, alors qu'en REST il faut
+   plusieurs appels (under-fetching) → c'est l'intérêt majeur.
+
+> 💡 *Indices du TP DigiDex* : vérifiez l'**uri** dans `app.config.ts` (pas de
+> placeholder oublié) ; `valueChanges` émet d'abord `data: undefined` → **filtrez**
+> avant le `map` ; importez `InMemoryCache` depuis `@apollo/client/core`.
 
 ---
 
 ## ❓ Questions à répondre *(dans le README, section « Réponses »)*
 
-Répondez en **2–4 phrases** chacune. Elles seront reprises en soutenance.
+Répondez en 2–4 phrases chacune. Elles seront reprises en soutenance.
 
-1. Différence entre un composant **« smart »** et **« dumb »** ? Donnez un exemple **dans votre projet**.
+1. Différence entre un composant **« smart »** et **« dumb »** ? Citez un exemple **de votre projet** (ex : page vs `CharacterCardComponent`).
 2. Pourquoi **`OnPush`** ? Quel lien avec l'**immutabilité** des données ?
-3. Pourquoi préférer le **`pipe async`** à un `subscribe()` manuel ? Quel **risque** évite-t-on ?
-4. `providedIn: 'root'` : quel **design pattern** ? Combien d'instances du service existe-t-il ?
-5. Différence entre un **`signal`** et un **`BehaviorSubject`** ? Quand utiliser l'un ou l'autre ?
-6. Pour une **recherche** au clavier : **`switchMap`** ou **`mergeMap`**, et pourquoi ?
-7. **Reactive Forms** vs **Template-driven** : votre choix et **pourquoi** ?
-8. Comment avez-vous **organisé vos services** (un par ressource, façade, état) et pourquoi ?
-9. Qu'apporte concrètement le **lazy loading** dans votre application ?
-10. *(Bonus)* GraphQL vs REST : expliquez **over-fetching** / **under-fetching** avec un exemple de votre projet.
+3. Pourquoi le **`pipe async`** plutôt qu'un `subscribe()` manuel ? Quel **risque** évite-t-on ?
+4. `providedIn: 'root'` : quel **design pattern** ? Combien d'instances de `CharacterService` existe-t-il ?
+5. Différence entre un **`signal`** et un **`BehaviorSubject`** ? Pourquoi avez-vous choisi un `signal` pour les favoris ?
+6. Pour la recherche : pourquoi **`switchMap`** (et pas `mergeMap`) ? À quoi sert `debounceTime` ?
+7. **Reactive Forms** vs **Template-driven** : pourquoi le projet impose le réactif ?
+8. Comment avez-vous récupéré les **relations** (épisodes d'un personnage, résidents d'un lieu) à partir des URLs ?
+9. Qu'apporte le **lazy loading** des routes `favoris` et `contact` ?
+10. *(Bonus)* GraphQL vs REST : montrez avec votre requête comment GraphQL évite plusieurs appels.
 
 ---
 
 ## 📸 Captures d'écran OBLIGATOIRES *(dossier `screenshots/` du dépôt)*
 
-Nommez-les clairement. On doit y voir :
-
-- [ ] `01-liste-ressource1.png` — une liste paginée (ressource 1)
-- [ ] `02-liste-ressource2.png` — une liste paginée (ressource 2)
-- [ ] `03-recherche.png` — la recherche en action
-- [ ] `04-detail.png` — une page détail
-- [ ] `05-relations.png` — la **navigation entre ressources liées** (depuis un détail)
-- [ ] `06-favoris.png` — un favori ajouté **+ encore présent après rechargement**
-- [ ] `07-dashboard.png` — le tableau de bord avec ses statistiques
-- [ ] `08-formulaire-erreurs.png` — le formulaire avec messages de validation
-- [ ] `09-loading-erreur.png` — l'état *chargement* et/ou l'état *erreur*
-- [ ] `10-arborescence.png` — la structure des dossiers (`services/`, `models/`, etc.)
+- [ ] `01-characters-list.png` — la liste paginée des personnages
+- [ ] `02-recherche-filtre.png` — recherche par nom + filtre status
+- [ ] `03-character-detail.png` — fiche personnage
+- [ ] `04-relations.png` — depuis un personnage : lien vers son **lieu** et ses **épisodes**
+- [ ] `05-location-detail.png` — fiche lieu avec ses **résidents**
+- [ ] `06-favoris.png` — un favori ⭐ **toujours présent après rechargement**
+- [ ] `07-dashboard.png` — le tableau de bord avec les statistiques
+- [ ] `08-contact-erreurs.png` — le formulaire avec messages de validation
+- [ ] `09-loading-erreur.png` — état *chargement* et/ou état *erreur*
+- [ ] `10-arborescence.png` — structure des dossiers (`pages/ components/ services/ models/ pipes/`)
 - [ ] *(bonus)* `11-graphql.png` — une requête GraphQL (onglet **Network** ou **Apollo Sandbox**)
 
 ---
@@ -178,98 +230,69 @@ Nommez-les clairement. On doit y voir :
 ## 📦 Structure attendue du dépôt
 
 ```
-mon-explorateur/
+rick-and-morty-explorer/
 ├── README.md            ← présentation, install/run, patterns, RÉPONSES aux questions
 ├── .gitignore           ← node_modules/ exclu !
 ├── screenshots/         ← toutes les captures demandées
-├── src/
-│   └── app/
-│       ├── pages/        ← composants "smart" (listes, détails, favoris, dashboard, form, 404)
-│       │   ├── ressource1-list/   ressource1-detail/
-│       │   ├── ressource2-list/   ressource2-detail/
-│       │   ├── ressource3-list/   ressource3-detail/
-│       │   ├── dashboard/
-│       │   ├── favoris/
-│       │   └── not-found/
-│       ├── components/   ← composants "dumb" réutilisables (card, search-bar, paginator, loader, error)
-│       ├── services/     ← ≥ 5 services (1 HTTP par ressource + favoris + util/facade)
-│       ├── models/       ← ≥ 5 interfaces (1 par ressource + types techniques)
-│       ├── pipes/        ← ≥ 2 pipes personnalisés
-│       ├── app.routes.ts
-│       └── app.config.ts
-└── (bonus) api-graphql/  ← votre passerelle Apollo Server, si Option B
+└── src/app/
+    ├── pages/           ← dashboard, characters-list, character-detail, locations-list,
+    │                       location-detail, episodes-list, episode-detail, favoris,
+    │                       contact, not-found
+    ├── components/      ← character-card, search-bar, paginator, loader, error-message
+    ├── services/        ← character, location, episode, favoris, storage
+    ├── models/          ← character, location, episode, info, api-response
+    ├── pipes/           ← status, truncate
+    ├── app.routes.ts
+    └── app.config.ts
 ```
 
-Votre **README** doit contenir au minimum :
-1. Le **nom du projet** et l'API utilisée + les **3 ressources** choisies.
-2. **Comment lancer** (`npm install`, `npm start`, port).
-3. La **liste des fonctionnalités** réalisées (cochez ce qui est fait).
-4. Les **design patterns** utilisés (où et pourquoi).
-5. L'**organisation des services et des modèles**.
-6. Les **réponses aux questions** ci-dessus.
-7. Les **captures** (ou un lien vers le dossier `screenshots/`).
+Le **README** doit contenir : nom du projet, **comment lancer** (`npm install` / `npm start`),
+liste des fonctionnalités réalisées (cochées), **design patterns** utilisés (où et pourquoi),
+**réponses aux 10 questions**, et les **captures**.
 
 ---
 
-## 📊 Barème indicatif (/20)
+## 📊 Barème (/20)
 
 | Critère | Points |
 |---|---|
-| Bloc A — Volume : ≥ 3 ressources, ≥ 5 modèles, ≥ 5 services, HTTP propre | **5** |
-| Bloc B — Navigation : ≥ 3 listes + ≥ 3 détails, relations, lazy loading, 404 | **4** |
-| Bloc C — Interactions : recherche, favoris persistants, dashboard, formulaire validé | **4** |
-| Bloc D — Qualité : OnPush, désabonnement, composants dumb, pipes, typage, archi | **2** |
+| Bloc A — 5 modèles + 5 services, HTTP typé, états loading/erreur | **5** |
+| Bloc B — 10 pages, routes, **relations entre ressources**, lazy loading, 404 | **4** |
+| Bloc C — recherche RxJS, pagination, favoris persistants, dashboard, formulaire validé | **4** |
+| Bloc D — 5 composants dumb, 2 pipes, OnPush, désabonnement, typage strict | **2** |
 | Git (commits réguliers) + README complet + réponses aux questions | **3** |
 | Soutenance / démo orale | **2** |
 | 🌟 **Bonus GraphQL** | **+2 à +3** |
 
-> La note peut **dépasser 20** grâce au bonus. Une appli qui **ne compile pas** ou
-> **ne se lance pas** est lourdement pénalisée → testez `npm install` sur un dossier propre avant de rendre.
+> Une appli qui **ne compile pas** ou **ne se lance pas** est lourdement pénalisée →
+> testez `npm install` sur un dossier propre avant de rendre.
 
 ---
 
 ## 🧠 Conseils & pièges à éviter *(retours d'expérience des TP)*
 
-- ✅ **Commencez par les modèles et les services** (Bloc A) : c'est la fondation. Une ressource qui marche bien → dupliquez le schéma pour les 2 autres.
-- ✅ **Factorisez vos composants dumb** (card, loader, paginator…) : ils servent pour les 3 ressources → moins de code, plus de points.
-- ✅ **Vérifiez `package.json`** : de vraies versions (pas de `"..."`) → sinon `ERR_MODULE_NOT_FOUND`.
-- ✅ **Control flow** : l'alias `as` est autorisé **uniquement sur le `@if` principal**, **jamais sur `@else if`** (erreur `NG5002`). Imbriquez dans `@else { @if (x; as y) {…} }`.
-- ✅ **Après modif de `app.config.ts`** (providers, Apollo…), **redémarrez `ng serve`** (pas géré par le HMR) + **hard refresh** (`Ctrl+Shift+R`).
-- ✅ **Gérez le `loading`** : Apollo émet d'abord `data: undefined` → **filtrez**. HttpClient → spinner + gestion d'erreur.
-- ✅ **CORS** si vous créez votre propre API.
-- ✅ **N'envoyez pas `node_modules`** dans Git (d'où le `.gitignore`).
+- ✅ **Commencez par les personnages** (modèle → service → liste → détail), puis **dupliquez** le schéma pour les lieux et les épisodes.
+- ✅ **Factorisez** : `CharacterCardComponent`, `LoaderComponent`, `PaginatorComponent` servent partout.
+- ✅ **Relations** : `character.episode` = des URLs → extrayez les `id` (`url.split('/').pop()`) → `getMany`.
+- ✅ **Control flow** : l'alias `as` est autorisé **uniquement sur le `@if` principal**, **jamais sur `@else if`** (erreur `NG5002`). Imbriquez : `@else { @if (data(); as d) {…} }`.
+- ✅ **Après modif de `app.config.ts`**, **redémarrez `ng serve`** (pas géré par le HMR) + **hard refresh** (`Ctrl+Shift+R`).
+- ✅ **Gérez le `loading`** : HttpClient → spinner + gestion d'erreur. Apollo → `data` `undefined` au début, **filtrez**.
+- ✅ **N'envoyez pas `node_modules`** dans Git (`.gitignore`).
 - ✅ **Committez régulièrement** : un seul commit « final » est mal vu.
-
----
-
-## 🗂️ Récapitulatif compétences ↔ TP
-
-| Fonctionnalité du projet | TP de référence |
-|---|---|
-| Composants standalone, control flow `@if`/`@for`, composants dumb | TP Composants & templates |
-| ≥ 5 services, injection de dépendances, singleton, façade | TP Services & DI |
-| Routing multi-pages, paramètres, relations, lazy loading, 404 | TP Routing |
-| Formulaire réactif & validation | TP Formulaires |
-| HttpClient, ≥ 3 services HTTP, Observables, recherche RxJS | TP HttpClient / RxJS |
-| Favoris + dashboard via signals / computed | TP Signals |
-| ≥ 2 pipes | TP Pipes |
-| Bonnes pratiques & design patterns | transversal (tous les TP) |
-| **GraphQL / Apollo (bonus)** | **TP DigiDex** |
 
 ---
 
 ## ✔️ Checklist avant de rendre
 
 - [ ] L'appli **se lance** sans erreur (`npm install` puis `npm start`).
-- [ ] **≥ 3 ressources**, **≥ 5 modèles**, **≥ 5 services**.
-- [ ] **≥ 3 listes** + **≥ 3 détails** + favoris + dashboard + formulaire + 404.
-- [ ] **Navigation entre ressources liées** fonctionnelle.
-- [ ] **≥ 1 route lazy**, **≥ 4 composants dumb**, **≥ 2 pipes**.
-- [ ] Favoris **persistants** après rechargement.
+- [ ] **5 modèles** + **5 services** créés et utilisés.
+- [ ] **10 pages** + routes + **relations** + lazy (`favoris`, `contact`) + 404.
+- [ ] **5 composants dumb** + **2 pipes**.
+- [ ] Recherche RxJS, pagination, favoris **persistants**, dashboard, formulaire validé.
 - [ ] `OnPush`, désabonnement propre, **aucun `any`**.
 - [ ] **README** complet + **réponses aux 10 questions**.
 - [ ] Dossier **`screenshots/`** rempli.
-- [ ] **`node_modules/` exclu** du dépôt, dépôt **public**, commits réguliers.
+- [ ] **`node_modules/` exclu**, dépôt **public**, commits réguliers.
 - [ ] Lien envoyé sur **Teams** ou à **contact.infosoftware@gmail.com** avant **jeudi 13h00**, objet `Nom Prénom — TP Projet Angular`.
 
 ---
