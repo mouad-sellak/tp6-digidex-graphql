@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QCM Angular — 40 questions /20</title>
+<!--
+  UTILISATION
+  • Le plus simple : ouvrir ce fichier directement dans un navigateur (double-clic).
+  • OU dans Google Apps Script : renomme ce fichier en "Index.html" et garde le
+    Code.gs fourni (doGet renvoie createHtmlOutputFromFile('Index')), puis déploie
+    en Application Web.
+-->
+<style>
+  :root{
+    --violet:#6c2bd9; --violet-clair:#9b5de5; --fond:#f5f3ff;
+    --carte:#fff; --texte:#1e1b2e; --doux:#6b6480; --bordure:#e7e1f5;
+    --ok:#2f9e44; --ko:#e03131; --ombre:0 4px 14px rgba(76,20,140,.10);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;color:var(--texte);
+    background:radial-gradient(1000px 500px at 100% -10%,rgba(155,93,229,.18),transparent),var(--fond);}
+  .wrap{max-width:860px;margin:0 auto;padding:1.5rem 1rem 6rem}
+  h1{font-size:2rem;font-weight:800;margin:.2rem 0 .2rem;
+    background:linear-gradient(90deg,var(--violet),var(--violet-clair));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--doux);margin:0 0 1.4rem}
+  .q{background:var(--carte);border:1px solid var(--bordure);border-radius:14px;
+    padding:1rem 1.1rem;margin-bottom:.9rem;box-shadow:var(--ombre)}
+  .q .num{font-weight:800;color:var(--violet)}
+  .q p{margin:.2rem 0 .8rem;font-weight:600}
+  .opt{display:block;padding:.5rem .7rem;border-radius:10px;cursor:pointer;margin:.25rem 0;border:1px solid transparent}
+  .opt:hover{background:var(--fond)}
+  .opt input{margin-right:.6rem}
+  .opt.good{background:#ebfbee;border-color:#b2f2bb}
+  .opt.bad{background:#fff0f0;border-color:#ffc9c9}
+  .btn{cursor:pointer;border:none;border-radius:999px;color:#fff;font-weight:700;font-size:1rem;
+    padding:.8rem 1.6rem;background:linear-gradient(90deg,var(--violet),var(--violet-clair));box-shadow:var(--ombre)}
+  .btn:hover{transform:translateY(-1px)}
+  .btn.ghost{background:#fff;color:var(--violet);border:2px solid var(--bordure)}
+  .actions{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1rem}
+  .result{position:sticky;bottom:0;margin-top:1.2rem;background:#fff;border:2px solid var(--violet);
+    border-radius:16px;padding:1.1rem 1.3rem;box-shadow:0 -6px 20px rgba(76,20,140,.18);text-align:center}
+  .result .note{font-size:2.4rem;font-weight:900;color:var(--violet)}
+  .result .msg{color:var(--doux);margin-top:.3rem}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🅰️ QCM Angular — Synthèse</h1>
+  <p class="sub">Tous les TP : composants, services &amp; DI, routing, formulaires, RxJS, signals, pipes, GraphQL, bonnes pratiques. <b>40 questions • noté sur 20.</b></p>
+
+  <div id="quiz"></div>
+</div>
+
+<script>
+/* 40 questions — format : ["énoncé", ["opt0","opt1","opt2","opt3"], indexBonneRéponse] */
+const QCM = [
+ ["Angular est un framework développé et maintenu par…", ["Facebook","Google","Microsoft","Amazon"], 1],
+ ["Un composant 'standalone' se passe de…", ["template","NgModule","sélecteur","décorateur"], 1],
+ ["Quel décorateur définit un composant ?", ["@Injectable","@Component","@Directive","@NgModule"], 1],
+ ["L'interpolation pour afficher une variable s'écrit…", ["[valeur]","{{ valeur }}","(valeur)","#valeur"], 1],
+ ["Le property binding (lier une propriété d'élément) s'écrit…", ["(prop)=\"x\"","[prop]=\"x\"","{{prop}}","#prop"], 1],
+ ["L'event binding (écouter un clic) s'écrit…", ["[click]=\"f()\"","(click)=\"f()\"","{{click}}","on-click"], 1],
+ ["Le binding bidirectionnel utilise la syntaxe…", ["[x]","(x)","[(ngModel)]","{{x}}"], 2],
+ ["La nouvelle syntaxe de condition (Angular 17+) est…", ["*ngIf","@if / @else","[hidden]","v-if"], 1],
+ ["La nouvelle boucle de template est…", ["*ngFor","@for (... ; track ...)","@loop","for()"], 1],
+ ["Dans @for, 'track' sert à…", ["trier","identifier chaque élément (performance)","filtrer","limiter"], 1],
+ ["@switch remplace l'ancienne directive…", ["ngFor","ngSwitch","ngStyle","ngClass"], 1],
+ ["Transmettre une donnée du parent vers l'enfant se fait via…", ["@Output()","@Input() (ou input())","un service obligatoire","localStorage"], 1],
+ ["Remonter un évènement de l'enfant vers le parent se fait via…", ["@Input()","@Output() (ou output())","window.event","une Promise"], 1],
+ ["Un service se déclare avec le décorateur…", ["@Service","@Injectable","@Component","@Provider"], 1],
+ ["providedIn: 'root' crée un service…", ["par composant","singleton, partagé dans toute l'app","jamais instancié","recréé à chaque appel"], 1],
+ ["La fonction moderne pour injecter une dépendance est…", ["provide()","inject()","require()","useDI()"], 1],
+ ["Le mécanisme qui fournit les dépendances aux classes est…", ["l'héritage","l'injection de dépendances (DI)","la réflexion","le binding"], 1],
+ ["HttpClient renvoie par défaut…", ["des Promises","des Observables","des tableaux","des signals"], 1],
+ ["Pour rendre HttpClient disponible (standalone), on ajoute…", ["importProvidersFrom(HttpModule)","provideHttpClient()","HttpClientModule dans bootstrap","rien"], 1],
+ ["Dans un template, la meilleure façon de consommer un Observable est…", ["subscribe() dans le constructeur","le pipe async","setInterval","toPromise()"], 1],
+ ["Le principal risque d'un subscribe() jamais nettoyé est…", ["une erreur de build","une fuite mémoire","un reload","aucun"], 1],
+ ["L'opérateur RxJS qui transforme la valeur émise est…", ["filter","map","tap","take"], 1],
+ ["L'opérateur RxJS qui ne laisse passer que certaines valeurs est…", ["map","filter","merge","scan"], 1],
+ ["Pour une recherche au clavier (annuler la requête précédente), on utilise…", ["mergeMap","switchMap","concatMap","forkJoin"], 1],
+ ["Pour ne pas lancer une requête à chaque touche tapée, on utilise…", ["delay","debounceTime","timeout","interval"], 1],
+ ["Un BehaviorSubject se distingue d'un Subject car il…", ["n'émet jamais","réémet la dernière valeur aux nouveaux abonnés","est synchrone seulement","n'a qu'un abonné"], 1],
+ ["On crée un état réactif (signal) avec…", ["new Signal()","signal(valeur)","createSignal()","useState()"], 1],
+ ["Pour LIRE un signal nommé count, on écrit…", ["count","count()","count.value","get(count)"], 1],
+ ["Une valeur DÉRIVÉE d'autres signals se crée avec…", ["effect()","computed()","derive()","memo()"], 1],
+ ["Pour exécuter un effet de bord quand un signal change, on utilise…", ["computed()","effect()","watch()","subscribe()"], 1],
+ ["Un pipe 'pur' (par défaut) se recalcule…", ["à chaque cycle de détection","seulement quand son entrée change","jamais","une seule fois"], 1],
+ ["Pour formater une date dans le template, on utilise le pipe…", ["| number","| date","| currency","| json"], 1],
+ ["Les routes d'une app standalone se fournissent via…", ["RouterModule.forRoot","provideRouter(routes)","app.routes()","new Router()"], 1],
+ ["Le composant de la route active s'affiche dans…", ["<router-view>","<router-outlet>","<ng-outlet>","<route>"], 1],
+ ["Un paramètre dynamique de route s'écrit…", ["/page/{id}","/page/:id","/page/?id","/page/[id]"], 1],
+ ["Charger une route uniquement quand nécessaire s'appelle…", ["eager loading","lazy loading (loadComponent)","preloading","tree shaking"], 1],
+ ["Pour autoriser/bloquer l'accès à une route, on utilise…", ["un pipe","un guard (CanActivate)","un intercepteur","un resolver de style"], 1],
+ ["En Reactive Forms, on construit le formulaire avec…", ["ngModel","FormBuilder / FormGroup","template ref","Validators seul"], 1],
+ ["Pour rendre un champ obligatoire, on utilise…", ["Validators.required","required() ","mandatory:true","FormControl.req"], 0],
+ ["Un avantage clé de GraphQL par rapport à REST est…", ["plusieurs endpoints","demander précisément les champs via un seul endpoint","pas de JSON","réponses chiffrées"], 1],
+];
+
+function render(){
+  const mount = document.getElementById('quiz');
+  let html='';
+  QCM.forEach((it,i)=>{
+    const [q,opts]=it;
+    html += '<div class="q" id="q'+i+'"><span class="num">Q'+(i+1)+'.</span> <p>'+q+'</p>';
+    opts.forEach((o,j)=>{ html += '<label class="opt"><input type="radio" name="q'+i+'" value="'+j+'">'+o+'</label>'; });
+    html += '</div>';
+  });
+  html += '<div class="actions">'
+       +  '<button class="btn" onclick="grade()">✅ Valider le QCM</button>'
+       +  '<button class="btn ghost" onclick="resetQuiz()">↺ Recommencer</button>'
+       +  '</div>'
+       +  '<div class="result hidden" id="res"></div>';
+  mount.innerHTML = html;
+}
+
+function grade(){
+  let correct=0, answered=0;
+  QCM.forEach((it,i)=>{
+    const good=it[2];
+    const sel=document.querySelector('input[name="q'+i+'"]:checked');
+    if(sel) answered++;
+    const block=document.getElementById('q'+i);
+    const labels=block.querySelectorAll('.opt');
+    labels.forEach(o=>o.classList.remove('good','bad'));
+    labels[good].classList.add('good');
+    if(sel){
+      const v=parseInt(sel.value,10);
+      if(v===good) correct++; else labels[v].classList.add('bad');
+    }
+  });
+
+  const note=(correct*0.5);                  // 40 * 0,5 = 20
+  const noteTxt=note.toFixed(1).replace('.0','');
+  let msg;
+  if(correct>=36) msg="Excellent ! Niveau expert Angular 🏆";
+  else if(correct>=28) msg="Très bien, solides bases 💪";
+  else if(correct>=20) msg="Pas mal, à consolider 👍";
+  else msg="À retravailler — relis les TP 📖";
+
+  let warn='';
+  if(answered<QCM.length){ warn='<div class="msg">⚠️ '+(QCM.length-answered)+' question(s) sans réponse (comptées fausses).</div>'; }
+
+  const box=document.getElementById('res');
+  box.innerHTML='<div class="note">'+noteTxt+' / 20</div>'
+    +'<div class="msg">'+correct+' / '+QCM.length+' bonnes réponses — '+msg+'</div>'+warn;
+  box.classList.remove('hidden');
+  box.scrollIntoView({behavior:'smooth',block:'end'});
+}
+
+function resetQuiz(){
+  QCM.forEach((it,i)=>{
+    const block=document.getElementById('q'+i);
+    block.querySelectorAll('.opt').forEach(o=>o.classList.remove('good','bad'));
+    block.querySelectorAll('input').forEach(inp=>inp.checked=false);
+  });
+  document.getElementById('res').classList.add('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>
