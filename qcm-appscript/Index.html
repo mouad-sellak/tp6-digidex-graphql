@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>DigiDex — QCM</title>
+<style>
+  :root{
+    --violet:#6c2bd9; --violet-clair:#9b5de5; --fond:#f5f3ff;
+    --carte:#fff; --texte:#1e1b2e; --doux:#6b6480; --bordure:#e7e1f5;
+    --ok:#2f9e44; --ko:#e03131; --ombre:0 4px 14px rgba(76,20,140,.10);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;color:var(--texte);
+    background:radial-gradient(1000px 500px at 100% -10%,rgba(155,93,229,.18),transparent),var(--fond);}
+  .wrap{max-width:860px;margin:0 auto;padding:1.5rem 1rem 5rem}
+  h1{font-size:2rem;font-weight:800;margin:.2rem 0 .2rem;
+    background:linear-gradient(90deg,var(--violet),var(--violet-clair));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--doux);margin:0 0 1.2rem}
+  .tabs{display:flex;gap:.6rem;margin-bottom:1.4rem;flex-wrap:wrap}
+  .tab{cursor:pointer;border:2px solid var(--bordure);background:#fff;color:var(--violet);
+    font-weight:700;padding:.6rem 1.1rem;border-radius:999px}
+  .tab.active{background:linear-gradient(90deg,var(--violet),var(--violet-clair));color:#fff;border-color:transparent}
+  .q{background:var(--carte);border:1px solid var(--bordure);border-radius:14px;
+    padding:1rem 1.1rem;margin-bottom:.9rem;box-shadow:var(--ombre)}
+  .q .num{font-weight:800;color:var(--violet)}
+  .q p{margin:.2rem 0 .8rem;font-weight:600}
+  .opt{display:block;padding:.5rem .7rem;border-radius:10px;cursor:pointer;margin:.25rem 0;border:1px solid transparent}
+  .opt:hover{background:var(--fond)}
+  .opt input{margin-right:.6rem}
+  .opt.good{background:#ebfbee;border-color:#b2f2bb}
+  .opt.bad{background:#fff0f0;border-color:#ffc9c9}
+  .btn{cursor:pointer;border:none;border-radius:999px;color:#fff;font-weight:700;font-size:1rem;
+    padding:.8rem 1.6rem;background:linear-gradient(90deg,var(--violet),var(--violet-clair));box-shadow:var(--ombre)}
+  .btn:hover{transform:translateY(-1px)}
+  .btn.ghost{background:#fff;color:var(--violet);border:2px solid var(--bordure)}
+  .actions{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1rem}
+  .result{position:sticky;bottom:0;margin-top:1.2rem;background:#fff;border:2px solid var(--violet);
+    border-radius:16px;padding:1.1rem 1.3rem;box-shadow:0 -6px 20px rgba(76,20,140,.18);text-align:center}
+  .result .note{font-size:2.2rem;font-weight:900;color:var(--violet)}
+  .result .msg{color:var(--doux);margin-top:.3rem}
+  .hidden{display:none}
+  .miss{outline:2px solid #ffd43b;border-radius:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🟣 DigiDex — QCM</h1>
+  <p class="sub">GraphQL · Apollo · Angular · debug — 2 QCM de 40 questions, notés sur 20.</p>
+
+  <div class="tabs">
+    <button class="tab active" id="tab1" onclick="show(1)">QCM 1 — GraphQL & API</button>
+    <button class="tab" id="tab2" onclick="show(2)">QCM 2 — Angular & Debug</button>
+  </div>
+
+  <div id="quiz1"></div>
+  <div id="quiz2" class="hidden"></div>
+</div>
+
+<script>
+/* ===================== QCM 1 — GraphQL & API (backend) ===================== */
+const QCM1 = [
+ ["GraphQL, c'est avant tout…", ["Une base de données","Un langage de requête pour les API","Un framework CSS","Un serveur web"], 1],
+ ["Combien d'endpoints expose typiquement une API GraphQL ?", ["Un par ressource","Un seul","Deux (lecture/écriture)","Aucun"], 1],
+ ["Quelle librairie serveur a-t-on utilisée ?", ["express-graphql","@apollo/server","graphql-yoga","mercurius"], 1],
+ ["Sur quel port tourne le serveur GraphQL du projet ?", ["3000","8080","4000","5000"], 2],
+ ["Quelle fonction démarre le serveur autonome ?", ["listen()","startStandaloneServer","createServer","app.run()"], 1],
+ ["SDL signifie…", ["Schema Definition Language","Server Data Layer","Standard Definition List","Simple Data Language"], 0],
+ ["Dans le schéma, 'Int!' veut dire…", ["Entier optionnel","Entier non null (obligatoire)","Liste d'entiers","Entier négatif"], 1],
+ ["'[String!]' représente…", ["Une chaîne unique","Une liste de chaînes non nulles","Un tableau d'entiers","Une chaîne obligatoire"], 1],
+ ["Le type racine pour la LECTURE s'appelle…", ["Read","Get","Query","Fetch"], 2],
+ ["Pour MODIFIER des données, on utiliserait le type…", ["Mutation","Update","Query","Subscription"], 0],
+ ["Un resolver reçoit les arguments…", ["(req, res)","(parent, args, context, info)","(data, error)","(query, variables)"], 1],
+ ["La query 'digimons(page, pageSize, name)' retourne…", ["[Digimon]","DigimonPage!","Digimon","String"], 1],
+ ["Valeur par défaut de 'page' dans le schéma ?", ["1","0","10","20"], 1],
+ ["Quelle API externe est interrogée par notre serveur ?", ["pokeapi.co","digi-api.com","digimon.dev","api.digi.io"], 1],
+ ["Le resolver 'digimon' appelle quelle fonction ?", ["getDigimon","fetchDigimon","loadDigimon","queryDigimon"], 1],
+ ["À quoi sert mapDigimon() ?", ["Trier les Digimon","Transformer la réponse REST brute en type propre","Mettre en cache","Paginer"], 1],
+ ["Pour les descriptions, on garde la langue…", ["fr_fr","en_us","ja_jp","toutes"], 1],
+ ["L'over-fetching, c'est…", ["Recevoir trop de données inutiles","Faire trop d'appels","Une erreur 500","Un cache trop grand"], 0],
+ ["L'under-fetching, c'est…", ["Recevoir trop de données","Devoir enchaîner plusieurs appels pour tout avoir","Un timeout","Une requête vide"], 1],
+ ["Avantage clé de GraphQL sur le payload ?", ["Réponses chiffrées","On demande précisément les champs voulus","Compression automatique","Pas de JSON"], 1],
+ ["Apollo Sandbox sert à…", ["Déployer","Explorer et tester le schéma","Compiler","Gérer le cache"], 1],
+ ["Le schéma GraphQL est…", ["Faiblement typé","Fortement typé (un contrat)","Sans type","Dynamique uniquement"], 1],
+ ["Le type Image contient…", ["url, size","href, transparent","src, alt","path, type"], 1],
+ ["Le type Evolution contient…", ["id, digimon, condition, image","name, level","from, to","stage, xp"], 0],
+ ["DigimonSummary est…", ["Le type complet","Une version légère (id, name, image)","Un type d'erreur","Un alias de Digimon"], 1],
+ ["Pourquoi un DigimonSummary séparé ?", ["Obligatoire en GraphQL","Liste plus légère, sans tous les détails","Pour la sécurité","Pour le cache"], 1],
+ ["'\"type\": \"module\"' dans package.json…", ["Active TypeScript","Active les ES Modules (import/export)","Crée un module npm","Active le strict mode"], 1],
+ ["ERR_MODULE_NOT_FOUND '@apollo/server' venait de…", ["node mal installé","Versions \"...\" placeholder → install cassé","Mauvais port","Pare-feu"], 1],
+ ["Le fix de cette erreur ?", ["Réinstaller node","Mettre de vraies versions puis npm install","Changer de port","Supprimer package.json"], 1],
+ ["L'erreur 'Cannot find module schema.js' venait de…", ["Un import oublié","Le fichier nommé shema.js (faute de frappe)","Un mauvais export","Node 20"], 1],
+ ["Le fix de la faute de frappe ?", ["Réécrire le schéma","Renommer shema.js → schema.js","Supprimer le fichier","Ajouter .js"], 1],
+ ["L'erreur 'Erreur API: 404' venait de…", ["L'API hors ligne","BASE avec '/digimon/1' en trop","CORS","Une mauvaise query"], 1],
+ ["La bonne valeur de BASE ?", ["https://digi-api.com","https://digi-api.com/api/v1","https://digi-api.com/api/v1/digimon/1","https://digi-api.com/v1"], 1],
+ ["La méthode HTTP d'une requête GraphQL classique ?", ["GET","POST","PUT","PATCH"], 1],
+ ["startStandaloneServer active le CORS par défaut ?", ["Non","Oui","Seulement en prod","Jamais"], 1],
+ ["Un champ NON demandé dans la requête est-il renvoyé ?", ["Oui, toujours","Non","Seulement les String","Aléatoire"], 1],
+ ["Le package 'graphql' fournit…", ["Le serveur HTTP","Le moteur GraphQL (parsing, exécution)","Le cache","L'UI Sandbox"], 1],
+ ["fetchDigimons construit items/totalPages à partir de…", ["data.results","data.content et data.pageable","data.items","data.list"], 1],
+ ["L'intérêt d'un BFF (Backend-For-Frontend) GraphQL ici ?", ["Remplacer la BDD","Nettoyer/remodeler/unifier les données pour le front","Héberger le front","Faire du SSR"], 1],
+ ["En GraphQL, ce qui décrit ce qu'on veut, c'est…", ["L'URL","La requête (les champs listés)","Les headers","Le verbe HTTP"], 1],
+];
+
+/* ===================== QCM 2 — Angular & Debug (front) ===================== */
+const QCM2 = [
+ ["Quelle version d'Angular est utilisée ?", ["15","17","19","12"], 2],
+ ["Les composants sont de type…", ["NgModule","Standalone","Web Components","Lazy"], 1],
+ ["Quelle API gère l'état réactif ?", ["RxJS BehaviorSubject","Les Signals","NgRx","localStorage"], 1],
+ ["Comment crée-t-on un signal ?", ["new Signal()","signal(valeur)","createSignal()","useSignal()"], 1],
+ ["Comment LIRE un signal dans le .ts ?", ["maSignal","maSignal()","maSignal.value","get(maSignal)"], 1],
+ ["Comment mettre à jour un signal ?", [".next()",".set() / .update()",".emit()",".push()"], 1],
+ ["Quelle librairie cliente GraphQL pour Angular ?", ["@apollo/client seul","apollo-angular","graphql-request","urql"], 1],
+ ["Où configure-t-on l'URL du serveur GraphQL ?", ["main.ts","app.config.ts (uri)","index.html","environment.ts"], 1],
+ ["La bonne valeur d'uri ?", ["http://localhost:4200/","http://localhost:4000/","/graphql","http://localhost:3000/"], 1],
+ ["Le bug du placeholder, c'était…", ["uri vide","uri restée '<%= endpoint %>'","uri en https","uri sans port"], 1],
+ ["Conséquence du placeholder dans l'uri ?", ["404","Requête vers localhost:4200/<%= endpoint %> → URI malformed","Timeout","CORS"], 1],
+ ["Pourquoi le message 'URI malformed' ?", ["JSON invalide","decodeURIComponent plante sur un % invalide","Port occupé","SSL"], 1],
+ ["Le nouveau control flow des conditions ?", ["*ngIf","@if / @else if / @else","[hidden]","switch"], 1],
+ ["La boucle dans le template ?", ["*ngFor","@for (... ; track ...)","@each","loop()"], 1],
+ ["À quoi sert 'track' dans @for ?", ["Trier","Identifier chaque élément (perf)","Filtrer","Limiter"], 1],
+ ["À quoi sert @empty ?", ["Vider la liste","Afficher quelque chose quand la liste est vide","Arrêter la boucle","Cacher le bloc"], 1],
+ ["L'alias 'as' est autorisé sur…", ["N'importe quel @else if","Le @if principal uniquement","Le @for","Le @switch"], 1],
+ ["L'erreur NG5002 disait…", ["Module introuvable","'as' expression is only allowed on the primary @if block","Property does not exist","Type mismatch"], 1],
+ ["Fix de '@else if (x; as y)' ?", ["Supprimer le as","En faire un @if principal ou l'imbriquer dans @else","Ajouter ?","Mettre un *ngIf"], 1],
+ ["provideHttpClient() est nécessaire pour…", ["Le router","HttpLink d'apollo-angular","Les signals","Le SSR"], 1],
+ ["watchQuery().valueChanges émet…", ["Une seule fois","Plusieurs fois (loading puis data)","Jamais","Sur erreur seulement"], 1],
+ ["L'erreur 'Cannot read properties of undefined (reading digimons)' venait de…", ["Mauvaise uri","result.data undefined pendant l'état loading","CORS","Un mauvais import"], 1],
+ ["Le fix dans le service ?", ["try/catch","filter(result => !!result.data) avant le map","async/await","retry()"], 1],
+ ["Pourquoi curl marchait mais pas le navigateur ?", ["curl ignore CORS","curl = 1 réponse ; Apollo émet un état loading intermédiaire","Le navigateur cache","Curl est plus rapide"], 1],
+ ["InMemoryCache sert à…", ["Stocker des fichiers","Mettre en cache les résultats des requêtes","Gérer les routes","Compiler"], 1],
+ ["De préférence, on importe InMemoryCache depuis…", ["@apollo/client (racine)","@apollo/client/core (évite React)","apollo-angular","graphql"], 1],
+ ["gql`...` sert à…", ["Styliser","Écrire/parser une requête GraphQL","Logger","Router"], 1],
+ ["Le service renvoie un…", ["Promise","Observable","Signal","Array"], 1],
+ ["map() de RxJS sert à…", ["Filtrer","Transformer la valeur émise","Réessayer","Annuler"], 1],
+ ["filter() de RxJS sert à…", ["Transformer","Ne laisser passer que certaines émissions","Mapper","Trier"], 1],
+ ["withComponentInputBinding() permet…", ["Le lazy loading","De recevoir les params de route en input()","Le SSR","Le cache"], 1],
+ ["input.required<string>() crée…", ["Un @Input optionnel","Un input obligatoire (signal d'entrée)","Un output","Un service"], 1],
+ ["[(ngModel)] nécessite quel module ?", ["RouterModule","FormsModule","CommonModule","HttpClientModule"], 1],
+ ["routerLink sert à…", ["Appeler l'API","Naviguer entre les routes","Lier un style","Binder un signal"], 1],
+ ["La route du détail est…", ["detail/:id","digimon/:id","digimon?id","/d/:id"], 1],
+ ["La route '**' (wildcard) sert à…", ["La home","Rediriger les URLs inconnues","Le 404 serveur","Le lazy load"], 1],
+ ["Pour que app.config.ts soit pris en compte, il faut…", ["Rien, HMR suffit","Redémarrer ng serve (pas géré par le HMR)","Vider la BDD","Recompiler l'API"], 1],
+ ["Le raccourci d'un hard refresh navigateur ?", ["F5","Ctrl + Shift + R","Ctrl + S","Alt + F4"], 1],
+ ["eventCoalescing dans provideZoneChangeDetection sert à…", ["Désactiver Zone.js","Regrouper les events pour la perf","Activer le SSR","Logger"], 1],
+ ["Le style global du projet est dans…", ["app.component.css","src/styles.scss","angular.json","main.ts"], 1],
+];
+
+/* ===================== Rendu & notation ===================== */
+function render(list, prefix, mountId, resultId){
+  const mount = document.getElementById(mountId);
+  let html = '';
+  list.forEach((item, i) => {
+    const [q, opts] = item;
+    html += '<div class="q" id="'+prefix+'_q'+i+'"><span class="num">Q'+(i+1)+'.</span> <p>'+q+'</p>';
+    opts.forEach((o, j) => {
+      const name = prefix+'_'+i;
+      html += '<label class="opt"><input type="radio" name="'+name+'" value="'+j+'">'+o+'</label>';
+    });
+    html += '</div>';
+  });
+  html += '<div class="actions">'
+       + '<button class="btn" onclick="grade('+JSON.stringify(prefix)+')">✅ Valider le QCM</button>'
+       + '<button class="btn ghost" onclick="resetQuiz('+JSON.stringify(prefix)+')">↺ Recommencer</button>'
+       + '</div>'
+       + '<div class="result hidden" id="'+resultId+'"></div>';
+  mount.innerHTML = html;
+}
+
+const DATA = { q1: {list: QCM1, result:'res1'}, q2: {list: QCM2, result:'res2'} };
+
+function grade(prefix){
+  const {list, result} = DATA[prefix];
+  let correct = 0, answered = 0, firstMissing = -1;
+  list.forEach((item, i) => {
+    const good = item[2];
+    const sel = document.querySelector('input[name="'+prefix+'_'+i+'"]:checked');
+    if (sel) answered++; else if (firstMissing < 0) firstMissing = i;
+    // reset visuel
+    const block = document.getElementById(prefix+'_q'+i);
+    block.classList.remove('miss');
+    block.querySelectorAll('.opt').forEach(o => o.classList.remove('good','bad'));
+    const labels = block.querySelectorAll('.opt');
+    labels[good].classList.add('good');
+    if (sel){
+      const v = parseInt(sel.value,10);
+      if (v === good) correct++; else labels[v].classList.add('bad');
+    }
+  });
+
+  const note = (correct * 0.5);                 // 40 questions * 0,5 = 20
+  const noteTxt = note.toFixed(1).replace('.0','');
+  const box = document.getElementById(result);
+  let msg;
+  if (correct >= 36) msg = "Champion Digiteam ! 🏆";
+  else if (correct >= 28) msg = "Très bien, niveau Ultimate ! 💪";
+  else if (correct >= 20) msg = "Pas mal, niveau Champion. À consolider 👍";
+  else msg = "Niveau Rookie — relis le README et recommence 📖";
+
+  let warn = '';
+  if (answered < list.length){
+    warn = '<div class="msg">⚠️ '+(list.length-answered)+' question(s) sans réponse (comptées fausses).</div>';
+  }
+  box.innerHTML = '<div class="note">'+noteTxt+' / 20</div>'
+    + '<div class="msg">'+correct+' / '+list.length+' bonnes réponses — '+msg+'</div>'
+    + warn;
+  box.classList.remove('hidden');
+  box.scrollIntoView({behavior:'smooth', block:'end'});
+}
+
+function resetQuiz(prefix){
+  const {list, result} = DATA[prefix];
+  list.forEach((item, i) => {
+    const block = document.getElementById(prefix+'_q'+i);
+    block.classList.remove('miss');
+    block.querySelectorAll('.opt').forEach(o => o.classList.remove('good','bad'));
+    block.querySelectorAll('input').forEach(inp => inp.checked = false);
+  });
+  document.getElementById(result).classList.add('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function show(n){
+  document.getElementById('quiz1').classList.toggle('hidden', n!==1);
+  document.getElementById('quiz2').classList.toggle('hidden', n!==2);
+  document.getElementById('tab1').classList.toggle('active', n===1);
+  document.getElementById('tab2').classList.toggle('active', n===2);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+render(QCM1, 'q1', 'quiz1', 'res1');
+render(QCM2, 'q2', 'quiz2', 'res2');
+</script>
+</body>
+</html>
